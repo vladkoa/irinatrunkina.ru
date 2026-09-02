@@ -1,0 +1,76 @@
+---
+const title = 'Ирина Трунькина — врач-кардиолог';
+const description = 'Официальный сайт Ирины Трунькиной. Информация о враче, публикации и запись на приём.';
+---
+
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width" />
+    <meta name="description" content={description} />
+    <title>{title}</title>
+    <style>
+      :root {
+        font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        color: #18212b;
+        background: #f6f8fa;
+      }
+      * { box-sizing: border-box; }
+      body { margin: 0; }
+      main {
+        min-height: 100vh;
+        display: grid;
+        place-items: center;
+        padding: 32px 20px;
+      }
+      .card {
+        width: min(760px, 100%);
+        background: white;
+        border: 1px solid #e4e8ec;
+        border-radius: 24px;
+        padding: clamp(28px, 6vw, 64px);
+        box-shadow: 0 18px 60px rgba(20, 32, 45, 0.08);
+      }
+      .eyebrow {
+        margin: 0 0 14px;
+        font-size: 14px;
+        font-weight: 700;
+        letter-spacing: .08em;
+        text-transform: uppercase;
+        color: #566473;
+      }
+      h1 {
+        margin: 0;
+        font-size: clamp(38px, 8vw, 72px);
+        line-height: 1.02;
+        letter-spacing: -.04em;
+      }
+      .lead {
+        margin: 24px 0 0;
+        max-width: 620px;
+        font-size: clamp(18px, 3vw, 23px);
+        line-height: 1.55;
+        color: #4b5968;
+      }
+      .note {
+        margin: 36px 0 0;
+        padding-top: 24px;
+        border-top: 1px solid #e7ebef;
+        color: #6a7683;
+        font-size: 15px;
+        line-height: 1.6;
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <section class="card">
+        <p class="eyebrow">irinatrunkina.ru</p>
+        <h1>Ирина Трунькина</h1>
+        <p class="lead">Врач-кардиолог. Здесь будет официальный сайт: информация о враче, полезные материалы и удобная запись на приём.</p>
+        <p class="note">Сайт находится в разработке. Это первая техническая версия.</p>
+      </section>
+    </main>
+  </body>
+</html>
