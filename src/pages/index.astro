@@ -196,13 +196,56 @@ const description = 'Официальный сайт Ирины Трунькин
         font-size: clamp(18px, 2.5vw, 22px);
         line-height: 1.55;
       }
+      .data-panel {
+        margin-top: 32px;
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 16px;
+      }
+      .data-card {
+        background: white;
+        border: 1px solid #e4e8ec;
+        border-radius: 20px;
+        padding: 28px;
+      }
+      .data-label {
+        margin: 0 0 12px;
+        color: #6a7683;
+        font-size: 13px;
+        font-weight: 800;
+        letter-spacing: .08em;
+        text-transform: uppercase;
+      }
+      .data-card h3 {
+        margin: 0;
+        font-size: 23px;
+        line-height: 1.25;
+      }
+      .data-card p {
+        margin: 12px 0 0;
+        color: #596776;
+        font-size: 16px;
+        line-height: 1.65;
+      }
+      .data-summary {
+        margin: 16px 0 0;
+        padding: 24px 26px;
+        border-radius: 20px;
+        background: #eef2f5;
+        max-width: 900px;
+        color: #314152;
+        font-size: 17px;
+        line-height: 1.65;
+      }
       @media (max-width: 720px) {
         main { padding: 16px 16px 56px; }
         .situations,
-        .approach-grid { grid-template-columns: 1fr; }
+        .approach-grid,
+        .data-panel { grid-template-columns: 1fr; }
         .situation { padding: 22px; }
         .approach-step { grid-template-columns: 38px 1fr; }
         .step-number { width: 38px; height: 38px; }
+        .data-card { padding: 22px; }
       }
     </style>
   </head>
@@ -328,6 +371,40 @@ const description = 'Официальный сайт Ирины Трунькин
               «с сердцем всё нормально», а понять, <strong>куда смотреть дальше и как собрать последовательный план действий.</strong>
             </p>
           </div>
+        </section>
+
+        <section class="section" aria-labelledby="data-title">
+          <p class="section-kicker">Дополнительные данные</p>
+          <h2 id="data-title">Когда в общей картине важны анализы и генетика</h2>
+          <p class="section-intro">
+            Не каждому пациенту нужен генетический тест или расширенный набор исследований. Но если такие данные
+            уже есть или для них есть клиническая задача, их можно рассматривать вместе с анамнезом, симптомами и обычной диагностикой.
+          </p>
+
+          <div class="data-panel">
+            <article class="data-card">
+              <p class="data-label">Лабораторные данные</p>
+              <h3>Не отдельные цифры, а их место в общей картине</h3>
+              <p>
+                Результаты анализов сопоставляются с жалобами, диагнозами, лечением и факторами риска,
+                чтобы понять, какие показатели действительно требуют внимания и что стоит уточнить дальше.
+              </p>
+            </article>
+
+            <article class="data-card">
+              <p class="data-label">Генетические исследования</p>
+              <h3>Дополнительный источник информации, а не диагноз сам по себе</h3>
+              <p>
+                Если генетическое исследование уже выполнено, его результаты рассматриваются как часть более широкой
+                клинической картины. Генетические данные не заменяют обследование и не определяют лечение изолированно.
+              </p>
+            </article>
+          </div>
+
+          <p class="data-summary">
+            <strong>Смысл не в «лечении по генам».</strong> Дополнительные данные используются только там, где они могут
+            помочь лучше сформулировать вопросы профилактики, обследования и дальнейшего наблюдения.
+          </p>
         </section>
       </div>
     </main>
