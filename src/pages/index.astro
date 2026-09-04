@@ -221,6 +221,32 @@ const description = 'Официальный сайт Ирины Трунькин
         display: flex;
         justify-content: flex-end;
       }
+      .final-cta {
+        margin-top: clamp(56px, 9vw, 96px);
+        padding: clamp(34px, 6vw, 64px);
+        border-radius: 24px;
+        background: #18212b;
+        color: white;
+      }
+      .final-cta .section-kicker { color: #aeb8c3; }
+      .final-cta h2 {
+        margin: 0;
+        max-width: 760px;
+        font-size: clamp(32px, 5vw, 52px);
+        line-height: 1.08;
+        letter-spacing: -.03em;
+      }
+      .final-cta p {
+        margin: 18px 0 0;
+        max-width: 760px;
+        color: #cbd3dc;
+        font-size: 18px;
+        line-height: 1.65;
+      }
+      .final-cta .button {
+        background: white;
+        color: #18212b;
+      }
       @media (max-width: 720px) {
         main { padding: 16px 16px 56px; }
         .situations,
@@ -394,6 +420,20 @@ const description = 'Официальный сайт Ирины Трунькин
                 Записаться к Ирине Трунькиной
               </a>
             </div>
+          </div>
+        </section>
+
+        <section class="final-cta" aria-labelledby="final-cta-title">
+          <p class="section-kicker">Очная консультация</p>
+          <h2 id="final-cta-title">Начать можно с обычного приёма</h2>
+          <p>
+            Если вас беспокоят сердечно-сосудистые симптомы, уже есть диагноз или результаты обследований,
+            которые хочется спокойно разобрать, можно записаться на очную консультацию к Ирине Трунькиной в «Мед Гарант».
+          </p>
+          <div class="actions">
+            <a class="button" href="https://lk.medgarant.info/reservation?initial=doc&step=datetime&department=10020850&dcode=10000436">
+              Записаться на консультацию
+            </a>
           </div>
         </section>
       </div>
