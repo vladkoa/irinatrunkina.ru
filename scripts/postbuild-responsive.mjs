@@ -3,6 +3,15 @@ import { readFile, writeFile } from 'node:fs/promises';
 const path = 'dist/index.html';
 let html = await readFile(path, 'utf8');
 
+// Mobile browsers otherwise use a ~980px layout viewport and simply scale the
+// desktop page down. That was the main reason responsive rules appeared to do nothing.
+if (!/<meta[^>]+name=["']viewport["']/i.test(html)) {
+  html = html.replace(
+    '</head>',
+    '<meta name="viewport" content="width=device-width, initial-scale=1" />\n</head>'
+  );
+}
+
 // Keep the role visible and semantically close to the doctor's name,
 // but remove the detached pill above the name.
 html = html.replace(
@@ -10,8 +19,6 @@ html = html.replace(
   '<h1>Ирина Трунькина</h1><p class="hero-role">Врач-кардиолог · терапевт</p>'
 );
 
-// Keep the original final CTA at the bottom and add a separate middle CTA
-// immediately after the “Как строится разбор” section.
 const bookingUrl = 'https://lk.medgarant.info/reservation?initial=doc&step=datetime&department=10020850&dcode=10000436';
 const middleCta = `
 <section class="mid-cta" aria-labelledby="mid-cta-title">
@@ -21,16 +28,20 @@ const middleCta = `
   <div class="actions"><a class="button" href="${bookingUrl}">Записаться на консультацию</a></div>
 </section>`;
 
-if (!html.includes('class="mid-cta"')) {
-  html = html.replace(
-    /(<section class="section" aria-labelledby="approach-title">[\s\S]*?<\/section>)/,
-    `$1${middleCta}`
-  );
+// Remove any previously injected middle CTA, then put exactly one copy between
+// “Как строится разбор” and “Дополнительные данные”.  Using the next section's
+// text marker is more reliable than depending on exact section attributes.
+html = html.replace(/\s*<section class="mid-cta"[\s\S]*?<\/section>/g, '');
+const additionalDataMarker = html.search(/ДОПОЛНИТЕЛЬНЫЕ ДАННЫЕ|Дополнительные данные/);
+if (additionalDataMarker !== -1) {
+  const nextSectionStart = html.lastIndexOf('<section', additionalDataMarker);
+  if (nextSectionStart !== -1) {
+    html = `${html.slice(0, nextSectionStart)}${middleCta}\n${html.slice(nextSectionStart)}`;
+  }
 }
 
 const responsiveCss = `
-<style id="responsive-v4">
-  /* Shared layout rhythm */
+<style id="responsive-v5">
   .wrap{width:min(1120px,100%)!important;margin-inline:auto!important}
   .section-head{max-width:780px!important}
   .section h2,.final h2,.mid-cta h2{line-height:1.14!important;letter-spacing:-.015em!important}
@@ -44,7 +55,6 @@ const responsiveCss = `
   .mid-cta h2{margin:0;max-width:820px;font-size:32px;font-weight:600}
   .mid-cta p:not(.kicker){margin:14px 0 0;max-width:760px;color:var(--muted);font-size:15px;line-height:1.62}
 
-  /* Desktop and desktop-view widths: give headings room instead of forcing random two-line wraps. */
   @media (min-width:900px){
     main{padding:28px 24px 72px!important}
     .section-head{max-width:none!important}
@@ -60,7 +70,6 @@ const responsiveCss = `
     .clinic-action{justify-content:flex-end!important;align-items:center!important}
   }
 
-  /* Tablet */
   @media (max-width:899px) and (min-width:761px){
     main{padding:20px 16px 60px!important}
     .hero{grid-template-columns:minmax(0,1.05fr) minmax(250px,.95fr)!important;gap:34px!important;padding:38px!important}
@@ -75,7 +84,6 @@ const responsiveCss = `
     .section h2,.final h2,.mid-cta h2{max-width:700px!important;white-space:normal!important;text-wrap:balance!important}
   }
 
-  /* Mobile */
   @media (max-width:760px){
     main{padding:10px 10px 44px!important}
     .hero{grid-template-columns:1fr!important;gap:22px!important;padding:20px!important}
@@ -90,14 +98,14 @@ const responsiveCss = `
     .detail{font-size:13.5px!important}
     .actions{width:100%!important}
     .hero .button,.final .button,.clinic .button,.mid-cta .button{width:100%!important;text-align:center!important}
-    .section{padding-top:46px!important}
+    .section{padding-top:42px!important}
     .section-head{max-width:none!important}
-    .section h2,.final h2,.mid-cta h2{max-width:none!important;font-size:clamp(24px,6.5vw,27px)!important;line-height:1.18!important;white-space:normal!important;text-wrap:balance!important}
+    .section h2,.final h2,.mid-cta h2{max-width:none!important;font-size:clamp(23px,6.3vw,26px)!important;line-height:1.16!important;white-space:normal!important;text-wrap:balance!important}
     .intro{max-width:none!important;font-size:14.5px!important}
     .grid2,.facts,.approach-grid,.clinic{grid-template-columns:1fr!important}
     .grid2,.facts{gap:10px!important}
     .clinic-action{justify-content:stretch!important}
-    .mid-cta{margin-top:38px!important;padding:24px 20px!important}
+    .mid-cta{margin-top:34px!important;padding:22px 18px!important}
   }
 
   @media (max-width:390px){
@@ -106,7 +114,9 @@ const responsiveCss = `
   }
 </style>`;
 
-if (html.includes('id="responsive-v4"')) {
+if (html.includes('id="responsive-v5"')) {
+  html = html.replace(/<style id="responsive-v5">[\s\S]*?<\/style>/, responsiveCss);
+} else if (html.includes('id="responsive-v4"')) {
   html = html.replace(/<style id="responsive-v4">[\s\S]*?<\/style>/, responsiveCss);
 } else if (html.includes('id="responsive-v3"')) {
   html = html.replace(/<style id="responsive-v3">[\s\S]*?<\/style>/, responsiveCss);
