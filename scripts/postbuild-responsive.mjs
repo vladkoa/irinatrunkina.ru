@@ -3,8 +3,7 @@ import { readFile, writeFile } from 'node:fs/promises';
 const path = 'dist/index.html';
 let html = await readFile(path, 'utf8');
 
-// Mobile browsers otherwise use a ~980px layout viewport and simply scale the
-// desktop page down. That was the main reason responsive rules appeared to do nothing.
+// Mobile viewport: without it, phones render a scaled desktop layout.
 if (!/<meta[^>]+name=["']viewport["']/i.test(html)) {
   html = html.replace(
     '</head>',
@@ -12,54 +11,52 @@ if (!/<meta[^>]+name=["']viewport["']/i.test(html)) {
   );
 }
 
-// Keep the role visible and semantically close to the doctor's name,
-// but remove the detached pill above the name.
+// Keep the role semantically close to the doctor's name.
 html = html.replace(
   '<p class="eyebrow">Врач-кардиолог · терапевт</p><h1>Ирина Трунькина</h1>',
   '<h1>Ирина Трунькина</h1><p class="hero-role">Врач-кардиолог · терапевт</p>'
 );
 
-const bookingUrl = 'https://lk.medgarant.info/reservation?initial=doc&step=datetime&department=10020850&dcode=10000436';
-const middleCta = `
-<section class="mid-cta" aria-labelledby="mid-cta-title">
-  <p class="kicker">Очная консультация</p>
-  <h2 id="mid-cta-title">Начать можно с первичной консультации</h2>
-  <p>Если есть симптомы, результаты обследований или вопросы по лечению, первый шаг — спокойно разобрать ситуацию и определить, что делать дальше.</p>
-  <div class="actions"><a class="button" href="${bookingUrl}">Записаться на консультацию</a></div>
-</section>`;
-
-// Remove any previously injected middle CTA, then put exactly one copy between
-// “Как строится разбор” and “Дополнительные данные”.  Using the next section's
-// text marker is more reliable than depending on exact section attributes.
+// Remove the injected duplicate CTA from previous builds.
 html = html.replace(/\s*<section class="mid-cta"[\s\S]*?<\/section>/g, '');
-const additionalDataMarker = html.search(/ДОПОЛНИТЕЛЬНЫЕ ДАННЫЕ|Дополнительные данные/);
-if (additionalDataMarker !== -1) {
-  const nextSectionStart = html.lastIndexOf('<section', additionalDataMarker);
-  if (nextSectionStart !== -1) {
-    html = `${html.slice(0, nextSectionStart)}${middleCta}\n${html.slice(nextSectionStart)}`;
+
+// There should be exactly three booking points on the page:
+// 1) hero, 2) the original consultation CTA moved to the middle,
+// 3) clinic booking at the bottom.
+// Reuse the original final block (the copy the user preferred) instead of creating a new one.
+const finalMatch = html.match(/<section class="final"[\s\S]*?<\/section>/);
+if (finalMatch) {
+  const finalSection = finalMatch[0];
+  html = html.replace(finalSection, '');
+
+  const additionalDataMarker = html.search(/ДОПОЛНИТЕЛЬНЫЕ ДАННЫЕ|Дополнительные данные/);
+  if (additionalDataMarker !== -1) {
+    const nextSectionStart = html.lastIndexOf('<section', additionalDataMarker);
+    if (nextSectionStart !== -1) {
+      html = `${html.slice(0, nextSectionStart)}${finalSection}\n${html.slice(nextSectionStart)}`;
+    }
   }
 }
 
 const responsiveCss = `
-<style id="responsive-v5">
+<style id="responsive-v6">
   .wrap{width:min(1120px,100%)!important;margin-inline:auto!important}
   .section-head{max-width:780px!important}
-  .section h2,.final h2,.mid-cta h2{line-height:1.14!important;letter-spacing:-.015em!important}
+  .section h2,.final h2{line-height:1.14!important;letter-spacing:-.015em!important}
   .intro{max-width:760px!important}
   .grid2,.facts{align-items:stretch!important}
   .box{height:100%!important}
   .actions{justify-content:flex-start!important}
   .hero-role{margin:8px 0 0;color:var(--muted);font-size:16px;font-weight:600;line-height:1.4}
 
-  .mid-cta{margin-top:54px;padding:30px 32px;background:var(--soft2);border:1px solid var(--line);border-radius:16px}
-  .mid-cta h2{margin:0;max-width:820px;font-size:32px;font-weight:600}
-  .mid-cta p:not(.kicker){margin:14px 0 0;max-width:760px;color:var(--muted);font-size:15px;line-height:1.62}
+  /* The moved consultation CTA is now a true middle-of-page block. */
+  .final{margin:54px 0 0!important}
 
   @media (min-width:900px){
     main{padding:28px 24px 72px!important}
     .section-head{max-width:none!important}
     .section h2{max-width:none!important;font-size:31px!important;white-space:nowrap!important;text-wrap:nowrap!important}
-    .final h2,.mid-cta h2{white-space:nowrap!important;text-wrap:nowrap!important}
+    .final h2{white-space:nowrap!important;text-wrap:nowrap!important}
     .hero{grid-template-columns:minmax(0,1.25fr) minmax(300px,.75fr)!important;gap:64px!important;padding:52px 56px!important;align-items:center!important}
     .hero-copy{min-width:0!important;max-width:650px!important}
     .hero-photo{width:100%!important;max-width:340px!important;justify-self:end!important;margin:0!important}
@@ -81,7 +78,7 @@ const responsiveCss = `
     .subhead{font-size:18px!important}
     .section{padding-top:56px!important}
     .section-head{max-width:700px!important}
-    .section h2,.final h2,.mid-cta h2{max-width:700px!important;white-space:normal!important;text-wrap:balance!important}
+    .section h2,.final h2{max-width:700px!important;white-space:normal!important;text-wrap:balance!important}
   }
 
   @media (max-width:760px){
@@ -97,15 +94,15 @@ const responsiveCss = `
     .lead{font-size:15px!important;line-height:1.62!important}
     .detail{font-size:13.5px!important}
     .actions{width:100%!important}
-    .hero .button,.final .button,.clinic .button,.mid-cta .button{width:100%!important;text-align:center!important}
+    .hero .button,.final .button,.clinic .button{width:100%!important;text-align:center!important}
     .section{padding-top:42px!important}
     .section-head{max-width:none!important}
-    .section h2,.final h2,.mid-cta h2{max-width:none!important;font-size:clamp(23px,6.3vw,26px)!important;line-height:1.16!important;white-space:normal!important;text-wrap:balance!important}
+    .section h2,.final h2{max-width:none!important;font-size:clamp(23px,6.3vw,26px)!important;line-height:1.16!important;white-space:normal!important;text-wrap:balance!important}
     .intro{max-width:none!important;font-size:14.5px!important}
     .grid2,.facts,.approach-grid,.clinic{grid-template-columns:1fr!important}
     .grid2,.facts{gap:10px!important}
     .clinic-action{justify-content:stretch!important}
-    .mid-cta{margin-top:34px!important;padding:22px 18px!important}
+    .final{margin-top:34px!important}
   }
 
   @media (max-width:390px){
@@ -114,7 +111,9 @@ const responsiveCss = `
   }
 </style>`;
 
-if (html.includes('id="responsive-v5"')) {
+if (html.includes('id="responsive-v6"')) {
+  html = html.replace(/<style id="responsive-v6">[\s\S]*?<\/style>/, responsiveCss);
+} else if (html.includes('id="responsive-v5"')) {
   html = html.replace(/<style id="responsive-v5">[\s\S]*?<\/style>/, responsiveCss);
 } else if (html.includes('id="responsive-v4"')) {
   html = html.replace(/<style id="responsive-v4">[\s\S]*?<\/style>/, responsiveCss);
