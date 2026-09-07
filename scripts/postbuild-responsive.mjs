@@ -3,7 +3,6 @@ import { readFile, writeFile } from 'node:fs/promises';
 const path = 'dist/index.html';
 let html = await readFile(path, 'utf8');
 
-// 1) Mobile viewport — required for real responsive layout on phones.
 if (!/<meta[^>]+name=["']viewport["']/i.test(html)) {
   html = html.replace(
     '</head>',
@@ -11,23 +10,17 @@ if (!/<meta[^>]+name=["']viewport["']/i.test(html)) {
   );
 }
 
-// 2) Keep the doctor's role next to the name instead of a detached pill.
 html = html.replace(
   '<p class="eyebrow">Врач-кардиолог · терапевт</p><h1>Ирина Трунькина</h1>',
   '<h1>Ирина Трунькина</h1><p class="hero-role">Врач-кардиолог · терапевт</p>'
 );
 
-// 3) Remove every temporary CTA ever injected by previous iterations.
 html = html.replace(/\s*<section class="mid-cta"[\s\S]*?<\/section>/g, '');
 
-// 4) There must be exactly ONE “Начать можно…” block.
-// It already exists in the Astro source as .final. Move that exact block
-// from the bottom to between “Как строится разбор” and “Дополнительные данные”.
 const finalMatch = html.match(/<section class="final"[\s\S]*?<\/section>/);
 if (finalMatch) {
   const finalBlock = finalMatch[0];
   html = html.replace(finalBlock, '');
-
   const dataMarker = html.search(/id=["']data-title["']/i);
   if (dataMarker !== -1) {
     const dataSectionStart = html.lastIndexOf('<section', dataMarker);
@@ -49,7 +42,7 @@ const responsiveCss = `
     main{padding:28px 22px 72px!important}
     .hero{grid-template-columns:minmax(0,1.35fr) minmax(300px,.65fr)!important;gap:64px!important;padding:52px 56px!important;align-items:center!important}
     .hero-copy{min-width:0!important;max-width:690px!important}
-    .hero-photo{max-width:340px!important;justify-self:end!important;margin:0!important}
+    .hero-photo{order:initial!important;max-width:340px!important;justify-self:end!important;margin:0!important}
     .hero-photo img{display:block!important;width:100%!important;height:auto!important}
     h1{font-size:clamp(40px,4vw,50px)!important;white-space:nowrap!important;line-height:1.02!important}
     .section-head{max-width:none!important}
@@ -60,11 +53,24 @@ const responsiveCss = `
     .final{margin-top:42px!important;padding:30px 32px!important}
   }
 
-  /* Tablet */
-  @media (max-width:980px) and (min-width:641px){
+  /* Tablet / browser desktop-view: keep hero side-by-side */
+  @media (max-width:980px) and (min-width:761px){
+    main{padding:18px 14px 60px!important}
+    .hero{grid-template-columns:minmax(0,1.2fr) minmax(240px,.8fr)!important;gap:32px!important;padding:34px!important;align-items:center!important}
+    .hero-copy{min-width:0!important}
+    .hero-photo{order:initial!important;width:100%!important;max-width:300px!important;justify-self:end!important;margin:0!important}
+    .hero-photo img{display:block!important;width:100%!important;height:auto!important}
+    h1{font-size:clamp(34px,4.4vw,42px)!important;white-space:nowrap!important}
+    .tagline{font-size:clamp(28px,3.6vw,32px)!important}
+    .facts{grid-template-columns:1fr 1fr!important}
+    .section-head{max-width:none!important}
+  }
+
+  /* Narrow tablet */
+  @media (max-width:760px) and (min-width:641px){
     main{padding:18px 14px 60px!important}
     .hero{grid-template-columns:1fr!important;gap:24px!important;padding:30px!important}
-    .hero-photo{order:-1!important;max-width:380px!important;justify-self:center!important;margin:0 auto!important}
+    .hero-photo{order:-1!important;max-width:360px!important;justify-self:center!important;margin:0 auto!important}
     .facts{grid-template-columns:1fr 1fr!important}
     .section-head{max-width:none!important}
   }
