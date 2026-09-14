@@ -8,7 +8,7 @@
   },
   "scripts": {
     "dev": "astro dev",
-    "build": "astro build && node scripts/postbuild-responsive.mjs",
+    "build": "astro build",
     "preview": "astro preview"
   },
   "dependencies": {
