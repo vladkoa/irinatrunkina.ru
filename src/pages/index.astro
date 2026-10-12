@@ -148,13 +148,18 @@ const structuredData = {
         line-height: 1.5;
       }
 
-      @media (max-width: 560px) {
-        main { align-items: flex-start; padding: 56px 20px 48px; }
-        .eyebrow { margin-bottom: 18px; font-size: 12px; }
-        h1 { font-size: clamp(40px, 14vw, 56px); }
-        .role { margin-top: 20px; font-size: 21px; }
-        .clinic { margin-top: 40px; padding-top: 24px; }
-        .button { width: 100%; }
+      @media (max-width: 768px) {
+        main { align-items: flex-start; padding: 44px 22px 52px; }
+        .page { width: 100%; }
+        .eyebrow { margin-bottom: 18px; font-size: 13px; }
+        h1 { font-size: clamp(48px, 13vw, 64px); line-height: 0.96; }
+        .role { margin-top: 22px; font-size: 24px; line-height: 1.3; }
+        .clinic { margin-top: 42px; padding-top: 28px; }
+        .location { font-size: 17px; }
+        .clinic-name { font-size: 26px; }
+        .address { margin-top: 10px; font-size: 18px; line-height: 1.6; }
+        .button { width: 100%; min-height: 58px; margin-top: 30px; font-size: 18px; border-radius: 12px; }
+        .experience { margin-top: 32px; font-size: 16px; }
       }
     </style>
   </head>
@@ -176,6 +181,7 @@ const structuredData = {
     </main>
   </body>
 </html>
+
 
 
 
